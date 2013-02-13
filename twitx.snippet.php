@@ -3,10 +3,12 @@
  * TwitX
  *
  * This MODX snippet loads Twitter feeds using the Twitter 1.1 REST API. 
- * You will need to create a Twitter app and get the keys and tokens
- * by creating a new app here: https://dev.twitter.com/apps/new
+ * You will need to create a Twitter app and get the keys and tokens: 
+ * https://dev.twitter.com/apps/new
  *
- * This uses twitteroauth: https://github.com/abraham/twitteroauth
+ * This Snippet uses evoChunkie
+ * This Snippet uses TwitterOAuth: https://github.com/abraham/twitteroauth
+ * This Snippet uses Cache Class: http://www.axel-hahn.de/php_contentcache.php
  *
  * TwitX is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -37,7 +39,7 @@ $twitTpl = isset($twitTpl) ? $twitTpl : '@FILE:assets/snippets/twitx/templates/t
 $timeline = isset($timeline) ? $timeline : 'user_timeline';
 $cache = isset($cache) ? $cache : 7200;
 $screen_name = isset($screen_name) ? $screen_name : '';
-$include_rts = isset($include_rts) ? $include_rts : 1;
+$include_rts = (isset($include_rts) && (!$include_rts)) ? 0 : 1;
 $outputSeparator = isset($outputSeparator) ? $outputSeparator : "\r\n";
 $toPlaceholder = isset($toPlaceholder) ? $toPlaceholder : '';
 
