@@ -1,11 +1,11 @@
 TwitX
 ================================================================================
 
-Load and display Twitter feeds in MODX using the Twitter 1.1 REST API.
+Load and display Twitter feeds in MODX Evolution using the Twitter 1.1 REST API.
 
 Features:
 --------------------------------------------------------------------------------
-This MODX snippet loads Twitter feeds using the Twitter 1.1 REST API. You will need to create a Twitter app and get the keys, secrets and token on https://dev.twitter.com/apps/new
+This MODX Evolution snippet loads Twitter feeds using the Twitter 1.1 REST API. You will need to create a Twitter app and get the keys, secrets and token on https://dev.twitter.com/apps/new
 
 Installation:
 --------------------------------------------------------------------------------
@@ -84,3 +84,4 @@ Notes:
 --------------------------------------------------------------------------------
 1. Uses Cache Class: http://www.axel-hahn.de/php_contentcache.php
 2. Uses TwitterOAuth Class: https://github.com/abraham/twitteroauth
+3. TwitX is an Evolution Port of TwitterX: http://modx.com/extras/package/twitterx
