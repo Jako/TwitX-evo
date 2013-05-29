@@ -12,7 +12,7 @@ Installation:
 1. Upload all files into the new folder *assets/snippets/twitx*
 2. Create a new snippet called TwitX with the following snippet code
     `<?php return include (MODX_BASE_PATH . 'assets/snippets/twitx/twitx.snippet.php'); ?>`
-3. If you are using the PHx plugin you should copy the PHx modifier from the folder `phx_modifier` to `assets/plugins/phx/modifiers`
+3. If you are using the PHx plugin (or more than one Snippet/Plugin with evoChunkie class) you should copy the PHx modifier from the folder `phx_modifier` to `assets/plugins/phx/modifiers`
 4. Create a Twitter app on https://dev.twitter.com/apps/new and note the Consumer Key and the Consumer Secret. On that page you have to create an access token and note the Access Token and the Access Token Secret. These values have to be used later in the snippet call.
 
 Usage
