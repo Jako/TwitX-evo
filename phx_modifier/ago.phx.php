@@ -3,8 +3,7 @@
  * description: returns a pretty date format in seconds, minutes, weeks or months ago. Takes in unixtime.
  * usage: [+unixtime:ago=`language`+]
  */
-
-include(MODX_BASE_PATH . 'assets/plugins/phx/modifiers/ago.language.php');
+include(realpath(dirname(__FILE__)).'/modifiers/ago.language.php');
 
 if (isset($language[$options])) {
 	$lang = $language[$options];
