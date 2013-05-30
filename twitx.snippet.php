@@ -85,10 +85,9 @@ if (!$twitter_consumer_key || !$twitter_consumer_secret || !$twitter_access_toke
 					'text' => urlencode(substr($modx->stripTags($tweet), 0, 140))
 				);
 				$json = $twitteroauth->post('direct_messages/new.json', $options);
-
 				$json = json_decode($json, TRUE);
 
-				if (isset($json->error)) {
+				if (isset($json['error'])) {
 					$output[] = "<strong>TwitX Error:</strong> Could not send the Tweet. Twitter responded with the error '" . $json->error . "'.";
 				} else {
 					$parser = new evoChunkie($tweetedTpl);
@@ -127,7 +126,8 @@ if (!$twitter_consumer_key || !$twitter_consumer_secret || !$twitter_access_toke
 					$json = $twitteroauth->get($timeline, $options);
 
 					// No errors? Save to Cache
-					if (!isset($json->error)) {
+					$status = json_decode($json);
+					if (!isset($status->error)) {
 						$myCache->write($json, $cache);
 					}
 				} else {
@@ -136,50 +136,17 @@ if (!$twitter_consumer_key || !$twitter_consumer_secret || !$twitter_access_toke
 				}
 
 				// Decode this now that we have used it above in the cache
-				$json = json_decode($json);
+				$json = json_decode($json, TRUE);
 
 				// If there any errors from Twitter, output them...
-				if (isset($json->error)) {
+				if (isset($json['error'])) {
 					$output[] = "<strong>TwitX Error:</strong> Could not load TwitX. Twitter responded with the error '" . $json->error . "'.";
 				} else {
 
 					$parser = new evoChunkie($twitTpl);
 					// For each result, output it
 					foreach ($json as $j) {
-
-						// Get placerholder values
-						$placeholders = array(
-							'created_at' => $j->created_at,
-							'source' => $j->source,
-							'id' => $j->id,
-							'id_str' => $j->id_str,
-							'text' => $j->text,
-							'name' => $j->user->name,
-							'screen_name' => $j->user->screen_name,
-							'profile_image_url' => $j->user->profile_image_url,
-							'location' => $j->user->location,
-							'url' => $j->user->url,
-							'description' => $j->user->description,
-						);
-						// If this is a retweet, create placeholders for this too
-						if (isset($j->retweeted_status)) {
-							$placeholders = array_merge($placeholders, array(
-								'retweet_count' => $j->retweeted_status->retweet_count,
-								'retweet_created_at' => $j->retweeted_status->created_at,
-								'retweet_source' => $j->retweeted_status->source,
-								'retweet_id' => $j->retweeted_status->id,
-								'retweet_id_str' => $j->retweeted_status->id_str,
-								'retweet_text' => $j->retweeted_status->text,
-								'retweet_name' => $j->retweeted_status->user->name,
-								'retweet_screen_name' => $j->retweeted_status->user->screen_name,
-								'retweet_profile_image_url' => $j->retweeted_status->user->profile_image_url,
-								'retweet_location' => $j->retweeted_status->user->location,
-								'retweet_url' => $j->retweeted_status->user->url,
-								'retweet_description' => $j->retweeted_status->user->description,
-									)
-							);
-						}
-						$parser->CreateVars($placeholders);
+						$parser->CreateVars($j);
 						// Parse chunk passing values
 						$output[] = $parser->Render();
 					}
