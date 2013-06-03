@@ -19,8 +19,7 @@
  *
  * TwitterXFormat author: Stewart Orr @ Qodo Ltd <stewart@qodo.co.uk>
  */
-$search = array('!(http://[^ ]+)!', '!@([\w_]+)!', '!#([A-Za-z0-9-_]+)!');
-$replace = array('<a href="$1" target="_blank" rel="nofollow">$1</a>', '<a href="http://twitter.com/$1" target="_blank" rel="nofollow">@$1</a>', '<a href="http://search.twitter.com/search?q=%23$1" target="_blank" rel="nofollow">#$1</a>');
+$search = array('! @([\w_]+)!', '! #([A-Za-z0-9-_]+)!');
+$replace = array(' <a href="http://twitter.com/$1" target="_blank" rel="nofollow">@$1</a>', ' <a href="http://search.twitter.com/search?q=%23$1" target="_blank" rel="nofollow">#$1</a>');
 return preg_replace($search, $replace, $output);
 ?>
-

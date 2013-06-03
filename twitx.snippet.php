@@ -37,6 +37,7 @@ $twitter_access_token_secret = isset($twitter_access_token_secret) ? $twitter_ac
 $limit = isset($limit) ? $limit : 5;
 $twitTpl = isset($twitTpl) ? $twitTpl : '@FILE:assets/snippets/twitx/templates/twitTpl.html';
 $timeline = isset($timeline) ? $timeline : 'user_timeline';
+$decodeUrls = isset($decodeUrls) ? (boolean) $decodeUrls : TRUE;
 $cache = isset($cache) ? $cache : 7200;
 $screen_name = isset($screen_name) ? $screen_name : '';
 $include_rts = (isset($include_rts) && (!$include_rts)) ? 0 : 1;
@@ -84,6 +85,11 @@ if (!$twitter_consumer_key || !$twitter_consumer_secret || !$twitter_access_toke
 			if ($screen_name != '') {
 				$options['screen_name'] = $screen_name;
 			}
+
+			if ($decodeUrls) {
+				$options['include_entities'] = true;
+			}
+
 			// If we are viewing favourites or regular statuses
 			if ($timeline != 'favorites') {
 				$timeline = 'statuses/' . $timeline;
@@ -91,7 +97,8 @@ if (!$twitter_consumer_key || !$twitter_consumer_secret || !$twitter_access_toke
 			$json = $twitteroauth->get($timeline, $options);
 
 			// No errors? Save to Cache
-			if (!isset($json->error)) {
+			$status = json_decode($json);
+			if (!isset($status->error)) {
 				$myCache->write($json, $cache);
 			}
 		} else {
@@ -100,60 +107,42 @@ if (!$twitter_consumer_key || !$twitter_consumer_secret || !$twitter_access_toke
 		}
 
 		// Decode this now that we have used it above in the cache
-		$json = json_decode($json);
+		$json = json_decode($json, true);
 
 		// If there any errors from Twitter, output them...
-		if (isset($json->error)) {
+		if (isset($json['error'])) {
 			$output[] = "<strong>TwitX Error:</strong> Could not load TwitX. Twitter responded with the error '" . $json->error . "'.";
 		} else {
 
-			$parser = new evoChunkie($twitTpl);
 			// For each result, output it
-			foreach ($json as $j) {
-
-				// Get placerholder values
-				$placeholders = array(
-					'created_at' => $j->created_at,
-					'source' => $j->source,
-					'id' => $j->id,
-					'id_str' => $j->id_str,
-					'text' => $j->text,
-					'name' => $j->user->name,
-					'screen_name' => $j->user->screen_name,
-					'profile_image_url' => $j->user->profile_image_url,
-					'location' => $j->user->location,
-					'url' => $j->user->url,
-					'description' => $j->user->description,
-				);
-				// If this is a retweet, create placeholders for this too
-				if (isset($j->retweeted_status)) {
-					$placeholders = array_merge($placeholders, array(
-						'retweet_count' => $j->retweeted_status->retweet_count,
-						'retweet_created_at' => $j->retweeted_status->created_at,
-						'retweet_source' => $j->retweeted_status->source,
-						'retweet_id' => $j->retweeted_status->id,
-						'retweet_id_str' => $j->retweeted_status->id_str,
-						'retweet_text' => $j->retweeted_status->text,
-						'retweet_name' => $j->retweeted_status->user->name,
-						'retweet_screen_name' => $j->retweeted_status->user->screen_name,
-						'retweet_profile_image_url' => $j->retweeted_status->user->profile_image_url,
-						'retweet_location' => $j->retweeted_status->user->location,
-						'retweet_url' => $j->retweeted_status->user->url,
-						'retweet_description' => $j->retweeted_status->user->description,
-							)
-					);
+			foreach ($json as &$j) {
+				$parser = new evoChunkie($twitTpl);
+				if ($decodeUrls) {
+					if (isset($j['retweeted_status'])) {
+						if (count($j['retweeted_status']['entities']['urls'])) {
+							foreach ($j['retweeted_status']['entities']['urls'] as $entity) {
+								$j['retweeted_status']['text'] = str_replace($entity['url'], '<a href="' . $entity['expanded_url'] . '">' . $entity['display_url'] . '</a>', $j['retweeted_status']['text']);
+							}
+						}
+					} else {
+						if (count($j['entities']['urls'])) {
+							foreach ($j['entities']['urls'] as $entity) {
+								$j['text'] = str_replace($entity['url'], '<a href="' . $entity['expanded_url'] . '">' . $entity['display_url'] . '</a>', $j['text']);
+							}
+						}
+					}
 				}
-				$parser->CreateVars($placeholders);
+				$parser->CreateVars($j);
 				// Parse chunk passing values
 				$output[] = $parser->Render();
 			}
+		}
 
-			// Added option to output to placeholder
-			if ($toPlaceholder != '') {
-				$modx->setPlaceholder($toPlaceholder, implode($outputSeparator, $output));
-				$output = array();
-				$outputSeparator = '';
-			}
+		// Added option to output to placeholder
+		if ($toPlaceholder != '') {
+			$modx->setPlaceholder($toPlaceholder, implode($outputSeparator, $output));
+			$output = array();
+			$outputSeparator = '';
 		}
 	}
 }
