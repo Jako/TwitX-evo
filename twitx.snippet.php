@@ -2,8 +2,8 @@
 /**
  * TwitX
  *
- * This MODX snippet loads Twitter feeds using the Twitter 1.1 REST API. 
- * You will need to create a Twitter app and get the keys and tokens: 
+ * This MODX snippet loads Twitter feeds using the Twitter 1.1 REST API.
+ * You will need to create a Twitter app and get the keys and tokens:
  * https://dev.twitter.com/apps/new
  *
  * This Snippet uses evoChunkie
@@ -18,13 +18,13 @@
  * TwitX is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
- * MODX Evolution Port of TwitterX
- * @author Thomas Jakobi <thomas.jakobi@partout.info> 
- * @version 0.9
  *
- * description: <strong>0.9</strong> Load Twitter feeds using the Twitter 1.1 REST API
- * 
+ * MODX Evolution Port of TwitterX
+ * @author Thomas Jakobi <thomas.jakobi@partout.info>
+ * @version 1.0
+ *
+ * description: <strong>1.0</strong> Load and display Twitter feeds and post Tweets using the Twitter 1.1 REST API
+ *
  * TwitterX author: Stewart Orr @ Qodo Ltd <stewart@qodo.co.uk>
  */
 // Twitter API keys and secrets
@@ -34,12 +34,15 @@ $twitter_access_token = isset($twitter_access_token) ? $twitter_access_token : F
 $twitter_access_token_secret = isset($twitter_access_token_secret) ? $twitter_access_token_secret : FALSE;
 
 // Other options
+$mode = isset($mode) ? $mode : 'timeline';
 $limit = isset($limit) ? $limit : 5;
 $twitTpl = isset($twitTpl) ? $twitTpl : '@FILE:assets/snippets/twitx/templates/twitTpl.html';
+$tweetedTpl = isset($tweetedTpl) ? $tweetedTpl : '@FILE:assets/snippets/twitx/templates/tweetedTpl.html';
 $timeline = isset($timeline) ? $timeline : 'user_timeline';
 $decodeUrls = isset($decodeUrls) ? (boolean) $decodeUrls : TRUE;
 $cache = isset($cache) ? $cache : 7200;
 $screen_name = isset($screen_name) ? $screen_name : '';
+$tweet = isset($tweet) ? $tweet : '';
 $include_rts = (isset($include_rts) && (!$include_rts)) ? 0 : 1;
 $outputSeparator = isset($outputSeparator) ? $outputSeparator : "\r\n";
 $toPlaceholder = isset($toPlaceholder) ? $toPlaceholder : '';
@@ -54,7 +57,7 @@ if (!class_exists('TwitterOAuth')) {
 	require MODX_BASE_PATH . 'assets/snippets/twitx/includes/twitteroauth/twitteroauth.php';
 }
 
-// HTML output 
+// HTML output
 $output = array();
 // If they haven't specified the required Twitter keys, we cannot continue...
 if (!$twitter_consumer_key || !$twitter_consumer_secret || !$twitter_access_token || !$twitter_access_token_secret) {
@@ -139,7 +142,7 @@ if (!$twitter_consumer_key || !$twitter_consumer_secret || !$twitter_access_toke
 				}
 
 				// Decode this now that we have used it above in the cache
-				$json = json_decode($json, true);
+				$json = json_decode($json, TRUE);
 
 				// If there any errors from Twitter, output them...
 				if (isset($json['error'])) {
