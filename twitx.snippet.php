@@ -64,85 +64,118 @@ if (!$twitter_consumer_key || !$twitter_consumer_secret || !$twitter_access_toke
 	if (!function_exists('curl_init')) {
 		$output[] = "<strong>TwitX Error:</strong> cURL functions do not exist, cannot continue.";
 	} else {
-		// Try loading the data from cache first
-		$myCache = new evoCache('TwitX', $screen_name . '_' . $timeline);
+		switch ($mode) {
+			case 'tweet':
+				if ($screen_name == '') {
+					$output[] = "<strong>TwitX Error:</strong> No Twitter screen name set for tweeting.";
+					break;
+				}
 
-		if ($myCache->isExpired()) {
-			// Load the TwitterOAuth lib required if not exists
-			// Create new twitteroauth
-			$twitteroauth = new TwitterOAuth($twitter_consumer_key, $twitter_consumer_secret, $twitter_access_token, $twitter_access_token_secret);
+				// Create new twitteroauth
+				$twitteroauth = new TwitterOAuth($twitter_consumer_key, $twitter_consumer_secret, $twitter_access_token, $twitter_access_token_secret);
 
-			// We want to use JSON format
-			$twitteroauth->format = 'json';
-			$twitteroauth->decode_json = FALSE;
+				// We want to use JSON format
+				$twitteroauth->format = 'json';
+				$twitteroauth->decode_json = FALSE;
 
-			// Request statuses with optinal parameters
-			$options = array(
-				'count' => $limit + 1,
-				'include_rts' => $include_rts
-			);
-			// If we have a screen_name, pass this to Twitter API
-			if ($screen_name != '') {
-				$options['screen_name'] = $screen_name;
-			}
+				$options = array(
+					'screen_name' => $screen_name,
+					'text' => urlencode(substr($modx->stripTags($tweet), 0, 140))
+				);
+				$json = $twitteroauth->post('direct_messages/new.json', $options);
+				$json = json_decode($json, TRUE);
 
-			if ($decodeUrls) {
-				$options['include_entities'] = true;
-			}
+				if (isset($json['error'])) {
+					$output[] = "<strong>TwitX Error:</strong> Could not send the Tweet. Twitter responded with the error '" . $json->error . "'.";
+				} else {
+					$parser = new evoChunkie($tweetedTpl);
+					$parser->CreateVars($json);
+					$output[] = $parser->Render();
+				}
 
-			// If we are viewing favourites or regular statuses
-			if ($timeline != 'favorites') {
-				$timeline = 'statuses/' . $timeline;
-			}
-			$json = $twitteroauth->get($timeline, $options);
+				break;
+			case 'timeline':
+			default:
+				// Try loading the data from cache first
+				$myCache = new evoCache('TwitX', $screen_name . '_' . $timeline);
 
-			// No errors? Save to Cache
-			$status = json_decode($json);
-			if (!isset($status->error)) {
-				$myCache->write($json, $cache);
-			}
-		} else {
-			// read cached data
-			$json = $myCache->read();
-		}
+				if ($myCache->isExpired()) {
+					// Load the TwitterOAuth lib required if not exists
+					// Create new twitteroauth
+					$twitteroauth = new TwitterOAuth($twitter_consumer_key, $twitter_consumer_secret, $twitter_access_token, $twitter_access_token_secret);
 
-		// Decode this now that we have used it above in the cache
-		$json = json_decode($json, true);
+					// We want to use JSON format
+					$twitteroauth->format = 'json';
+					$twitteroauth->decode_json = FALSE;
 
-		// If there any errors from Twitter, output them...
-		if (isset($json['error'])) {
-			$output[] = "<strong>TwitX Error:</strong> Could not load TwitX. Twitter responded with the error '" . $json->error . "'.";
-		} else {
+					// Request statuses with optinal parameters
+					$options = array(
+						'count' => $limit + 1,
+						'include_rts' => $include_rts
+					);
+					// If we have a screen_name, pass this to Twitter API
+					if ($screen_name != '') {
+						$options['screen_name'] = $screen_name;
+					}
 
-			// For each result, output it
-			foreach ($json as &$j) {
-				$parser = new evoChunkie($twitTpl);
-				if ($decodeUrls) {
-					if (isset($j['retweeted_status'])) {
-						if (count($j['retweeted_status']['entities']['urls'])) {
-							foreach ($j['retweeted_status']['entities']['urls'] as $entity) {
-								$j['retweeted_status']['text'] = str_replace($entity['url'], '<a href="' . $entity['expanded_url'] . '">' . $entity['display_url'] . '</a>', $j['retweeted_status']['text']);
+					if ($decodeUrls) {
+						$options['include_entities'] = true;
+					}
+
+					// If we are viewing favourites or regular statuses
+					if ($timeline != 'favorites') {
+						$timeline = 'statuses/' . $timeline;
+					}
+					$json = $twitteroauth->get($timeline, $options);
+
+					// No errors? Save to Cache
+					$status = json_decode($json);
+					if (!isset($status->error)) {
+						$myCache->write($json, $cache);
+					}
+				} else {
+					// read cached data
+					$json = $myCache->read();
+				}
+
+				// Decode this now that we have used it above in the cache
+				$json = json_decode($json, true);
+
+				// If there any errors from Twitter, output them...
+				if (isset($json['error'])) {
+					$output[] = "<strong>TwitX Error:</strong> Could not load TwitX. Twitter responded with the error '" . $json->error . "'.";
+				} else {
+
+					// For each result, output it
+					foreach ($json as &$j) {
+						$parser = new evoChunkie($twitTpl);
+						if ($decodeUrls) {
+							if (isset($j['retweeted_status'])) {
+								if (count($j['retweeted_status']['entities']['urls'])) {
+									foreach ($j['retweeted_status']['entities']['urls'] as $entity) {
+										$j['retweeted_status']['text'] = str_replace($entity['url'], '<a href="' . $entity['expanded_url'] . '">' . $entity['display_url'] . '</a>', $j['retweeted_status']['text']);
+									}
+								}
+							} else {
+								if (count($j['entities']['urls'])) {
+									foreach ($j['entities']['urls'] as $entity) {
+										$j['text'] = str_replace($entity['url'], '<a href="' . $entity['expanded_url'] . '">' . $entity['display_url'] . '</a>', $j['text']);
+									}
+								}
 							}
 						}
-					} else {
-						if (count($j['entities']['urls'])) {
-							foreach ($j['entities']['urls'] as $entity) {
-								$j['text'] = str_replace($entity['url'], '<a href="' . $entity['expanded_url'] . '">' . $entity['display_url'] . '</a>', $j['text']);
-							}
-						}
+						$parser->CreateVars($j);
+						// Parse chunk passing values
+						$output[] = $parser->Render();
 					}
 				}
-				$parser->CreateVars($j);
-				// Parse chunk passing values
-				$output[] = $parser->Render();
-			}
-		}
 
-		// Added option to output to placeholder
-		if ($toPlaceholder != '') {
-			$modx->setPlaceholder($toPlaceholder, implode($outputSeparator, $output));
-			$output = array();
-			$outputSeparator = '';
+				// Added option to output to placeholder
+				if ($toPlaceholder != '') {
+					$modx->setPlaceholder($toPlaceholder, implode($outputSeparator, $output));
+					$output = array();
+					$outputSeparator = '';
+				}
 		}
 	}
 }

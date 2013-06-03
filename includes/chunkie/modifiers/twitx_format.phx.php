@@ -15,7 +15,7 @@
  *
  * MODX Evolution Port of TwitterXFormat
  * @author Thomas Jakobi <thomas.jakobi@partout.info>
- * @version 0.7
+ * @version 1.0
  *
  * TwitterXFormat author: Stewart Orr @ Qodo Ltd <stewart@qodo.co.uk>
  */

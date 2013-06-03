@@ -1,7 +1,7 @@
 TwitX
 ================================================================================
 
-Load and display Twitter feeds in MODX Evolution using the Twitter 1.1 REST API.
+Load and display Twitter feeds and post Tweets using the Twitter 1.1 REST API
 
 Features:
 --------------------------------------------------------------------------------
@@ -21,10 +21,10 @@ Usage
 Basic snippet call:
 
 ```
-[!TwitX? 
+[!TwitX?
     &twitter_consumer_key=`aaaa`
-    &twitter_consumer_secret=`bbbb` 
-    &twitter_access_token=`cccc` 
+    &twitter_consumer_secret=`bbbb`
+    &twitter_access_token=`cccc`
     &twitter_access_token_secret=`dddd`
 !]
 ```
@@ -38,45 +38,42 @@ twitter_access_token | **required:** your twitter access token | -
 twitter_access_token_secret | **required:** your twitter access token secret | -
 limit | limit the number of statuses to display | 5
 twitTpl | template chunk for one twitter status | `twitTpl.html` in folder `templates`
-timeline | name of the twitter timeline | user_timeline
+timeline | name of the twitter timeline* | user_timeline
+decodeUrls | decode shortened t.co urls | 1;
 cache | seconds the twitter feed ist cached | 7200
 screen_name | screen name of the user the twitter feed is loaded from | -
 include_rts | include retweets | 1
 outputSeparator | separator between two twitTpl elements | `newline`
 toPlaceholder | a placeholder name the snippet output is assigned to. surpesses normal snippet output | -
 
+* Possible timelines: favorites, mentions_timeline, user_timeline, home_timeline, retweets_of_me
+
 Placeholder
 --------------------------------------------------------------------------------
-The following placeholder could be used in the template chunk:
+Look in the Twitter 1.1 REST API for possible placeholder in the TwitX template.
 
-Placeholder | Value
------------ | ------------------------------------------------------------------
-created_at | create date of the twitter status
-source | source of the twitter status (application like web, iOS etc)
-id | id of the twitter status
-text | text of the twitter status
-name | name of the twitter status creator
-screen_name | username of the twitter status creator
-profile_image_url | avatar image url of the twitter status creator
-location | location of the twitter status creator
-url | url of the twitter status creator
-description | user profile of the twitter status creator
+Each member of the response object could be referenced by its name. Members of a member could be referenced by name of the parent member and the name of the member divided by `.`.
 
-For retweets the following placeholder could be used in the template chunk:
+Example response object:
 
-Placeholder | Value
------------ | ------------------------------------------------------------------
-retweet_created_at | create date of the retweeted twitter status
-retweet_source | source of the retweeted twitter status (application like web, iOS etc)
-retweet_id | id of the retweeted twitter status
-retweet_id_str | id of the retweeted twitter status (twitter.com/user/statuses/id_str)
-retweet_text | text of the retweeted twitter status
-retweet_name | name of the retweeted twitter status creator
-retweet_screen_name | username of the retweeted twitter status creator
-retweet_profile_image_url | avatar image url of the retweeted twitter status creator
-retweet_location | location of the retweeted twitter status creator
-retweet_url | url of the retweeted twitter status creator
-retweet_description | user profile of the retweeted twitter status creator
+```
+[
+  {
+    "created_at": "Wed Aug 29 17:12:58 +0000 2012",
+    "entities": {
+      "urls": [
+        {
+          "expanded_url": "https://dev.twitter.com/blog/twitter-certified-products"
+        }
+      ]
+    }
+  }
+]
+```
+
+Possible placeholder showing a value are: `[+created_at+]` `[+entities.urls.expanded_url+]`
+
+These placeholder could be modified by PHx modifier.
 
 Notes:
 --------------------------------------------------------------------------------
