@@ -21,9 +21,9 @@
  * 
  * MODX Evolution Port of TwitterX
  * @author Thomas Jakobi <thomas.jakobi@partout.info> 
- * @version 0.9
+ * @version 1.0
  *
- * description: <strong>0.9</strong> Load Twitter feeds using the Twitter 1.1 REST API
+ * description: <strong>1.0</strong> Load and display Twitter feeds and post Tweets using the Twitter 1.1 REST API
  * 
  * TwitterX author: Stewart Orr @ Qodo Ltd <stewart@qodo.co.uk>
  */
@@ -137,7 +137,6 @@ if (!$twitter_consumer_key || !$twitter_consumer_secret || !$twitter_access_toke
 
 				// Decode this now that we have used it above in the cache
 				$json = json_decode($json, TRUE);
-
 				// If there any errors from Twitter, output them...
 				if (isset($json['error'])) {
 					$output[] = "<strong>TwitX Error:</strong> Could not load TwitX. Twitter responded with the error '" . $json->error . "'.";
