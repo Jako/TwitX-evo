@@ -40,7 +40,7 @@ limit | limit the number of statuses to display | 5
 twitTpl | template chunk for one twitter status | `twitTpl.html` in folder `templates`
 timeline | name of the twitter timeline* | user_timeline
 decodeUrls | decode shortened t.co urls | 1;
-cache | seconds the twitter feed ist cached | 7200
+cache | seconds the twitter feed ist cached (0 = disable cache) | 7200
 screen_name | screen name of the user the twitter feed is loaded from | -
 include_rts | include retweets | 1
 outputSeparator | separator between two twitTpl elements | `newline`

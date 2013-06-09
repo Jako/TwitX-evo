@@ -102,7 +102,7 @@ if (!$twitter_consumer_key || !$twitter_consumer_secret || !$twitter_access_toke
 				// Try loading the data from cache first
 				$myCache = new evoCache('TwitX', $screen_name . '_' . $timeline);
 
-				if ($myCache->isExpired()) {
+				if ($myCache->isExpired() || $cache == 0) {
 					// Load the TwitterOAuth lib required if not exists
 					// Create new twitteroauth
 					$twitteroauth = new TwitterOAuth($twitter_consumer_key, $twitter_consumer_secret, $twitter_access_token, $twitter_access_token_secret);
@@ -113,7 +113,7 @@ if (!$twitter_consumer_key || !$twitter_consumer_secret || !$twitter_access_toke
 
 					// Request statuses with optinal parameters
 					$options = array(
-						'count' => $limit + 1,
+						'count' => $limit,
 						'include_rts' => $include_rts
 					);
 					// If we have a screen_name, pass this to Twitter API
