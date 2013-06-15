@@ -21,9 +21,9 @@
  *
  * MODX Evolution Port of TwitterX
  * @author Thomas Jakobi <thomas.jakobi@partout.info>
- * @version 1.0
+ * @version 1.1
  *
- * description: <strong>1.0</strong> Load and display Twitter feeds and post Tweets using the Twitter 1.1 REST API
+ * description: <strong>1.1</strong> Load and display Twitter feeds and post Tweets using the Twitter 1.1 REST API
  *
  * TwitterX author: Stewart Orr @ Qodo Ltd <stewart@qodo.co.uk>
  */
@@ -43,6 +43,8 @@ $decodeUrls = isset($decodeUrls) ? (boolean) $decodeUrls : TRUE;
 $cache = isset($cache) ? $cache : 7200;
 $screen_name = isset($screen_name) ? $screen_name : '';
 $tweet = isset($tweet) ? $tweet : '';
+$targetBlank = (isset($targetBlank) && $targetBlank == '0') ? '' : ' target="_blank"';
+$relNofollow = (isset($relNofollow) && $relNofollow == '0') ? '' : ' rel="nofollow"';
 $include_rts = (isset($include_rts) && (!$include_rts)) ? 0 : 1;
 $outputSeparator = isset($outputSeparator) ? $outputSeparator : "\r\n";
 $toPlaceholder = isset($toPlaceholder) ? $toPlaceholder : '';
@@ -55,6 +57,38 @@ if (!class_exists('evoCache')) {
 }
 if (!class_exists('TwitterOAuth')) {
 	require MODX_BASE_PATH . 'assets/snippets/twitx/includes/twitteroauth/twitteroauth.php';
+}
+
+if (!function_exists('twitxFormat')) {
+
+	function twitxFormat($entry, $targetBlank, $relNofollow) {
+		//replace hashtags,
+		if (count($entry['entities']['hashtags'])) {
+			foreach ($entry['entities']['hashtags'] as $entity) {
+				$entry['text'] = str_replace('#' . $entity['text'], '<a href="https://twitter.com/search?q=%23' . $entity['text'] . '&src=hash"' . $targetBlank . $relNofollow . '>#' . $entity['text'] . '</a>', $entry['text']);
+			}
+		}
+		// urls,
+		if (count($entry['entities']['urls'])) {
+			foreach ($entry['entities']['urls'] as $entity) {
+				$entry['text'] = str_replace($entity['url'], '<a href="' . $entity['expanded_url'] . '"' . $targetBlank . $relNofollow . '>' . $entity['display_url'] . '</a>', $entry['text']);
+			}
+		}
+		// user mentions
+		if (count($entry['entities']['user_mentions'])) {
+			foreach ($entry['entities']['user_mentions'] as $entity) {
+				$entry['text'] = str_replace('@' . $entity['screen_name'], '<a href="https://twitter.com/' . $entity['screen_name'] . '"' . $targetBlank . $relNofollow . '>@' . $entity['screen_name'] . '</a>', $entry['text']);
+			}
+		}
+		// and media entities
+		if (count($entry['entities']['media'])) {
+			foreach ($entry['entities']['media'] as $entity) {
+				$entry['text'] = str_replace($entity['url'], '<a href="' . $entity['expanded_url'] . '"' . $targetBlank . $relNofollow . '>' . $entity['display_url'] . '</a>', $entry['text']);
+			}
+		}
+		return $entry;
+	}
+
 }
 
 // HTML output
@@ -148,24 +182,16 @@ if (!$twitter_consumer_key || !$twitter_consumer_secret || !$twitter_access_toke
 				if (isset($json['error'])) {
 					$output[] = "<strong>TwitX Error:</strong> Could not load TwitX. Twitter responded with the error '" . $json->error . "'.";
 				} else {
-
 					// For each result, output it
 					foreach ($json as &$j) {
 						$parser = new evoChunkie($twitTpl);
 						if ($decodeUrls) {
+							// work retweeted text
 							if (isset($j['retweeted_status'])) {
-								if (count($j['retweeted_status']['entities']['urls'])) {
-									foreach ($j['retweeted_status']['entities']['urls'] as $entity) {
-										$j['retweeted_status']['text'] = str_replace($entity['url'], '<a href="' . $entity['expanded_url'] . '">' . $entity['display_url'] . '</a>', $j['retweeted_status']['text']);
-									}
-								}
-							} else {
-								if (count($j['entities']['urls'])) {
-									foreach ($j['entities']['urls'] as $entity) {
-										$j['text'] = str_replace($entity['url'], '<a href="' . $entity['expanded_url'] . '">' . $entity['display_url'] . '</a>', $j['text']);
-									}
-								}
+								$j['retweeted_status'] = twitxFormat($j['retweeted_status'], $targetBlank, $relNofollow);
 							}
+							// work text
+							$j = twitxFormat($j, $targetBlank, $relNofollow);
 						}
 						$parser->CreateVars($j);
 						// Parse chunk passing values

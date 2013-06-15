@@ -1,6 +1,11 @@
 History
 ================================================================================
 
+- 1.1 June 15, 2013
+    - Updated twitterOAuth class (to solve Twitter 1.1 REST API problems)
+	- Changed link replacement in Tweet output
+    - Removed twitx_format PHx modifier
+    - New parameter targetBlank and relNofollow
 - 1.0b June 3, 2013
 	- Send Tweets
     - All fields in response from Twitter 1.1 REST API are now usable as placeholder in TwitX templates

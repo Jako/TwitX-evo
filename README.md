@@ -42,6 +42,8 @@ timeline | name of the twitter timeline* | user_timeline
 decodeUrls | decode shortened t.co urls | 1;
 cache | seconds the twitter feed ist cached (0 = disable cache) | 7200
 screen_name | screen name of the user the twitter feed is loaded from | -
+targetBlank | if not set to 0 all a tags have target="_blank" | 1
+relNofollow | if not set to 0 all a tags have rel="nofollow" | 0
 include_rts | include retweets | 1
 outputSeparator | separator between two twitTpl elements | `newline`
 toPlaceholder | a placeholder name the snippet output is assigned to. surpesses normal snippet output | -
