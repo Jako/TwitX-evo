@@ -82,3 +82,4 @@ Notes:
 1. Uses Cache Class: http://www.axel-hahn.de/php_contentcache.php
 2. Uses TwitterOAuth Class: https://github.com/abraham/twitteroauth
 3. TwitX is an Evolution Port of TwitterX: http://modx.com/extras/package/twitterx
+4. TwitX uses its own cache settings and cache files and its cache could only be bypassed before the default or presetted cache lifetime by using the parameter `` &cache=`0` ``. During the testing phase this cache setting should be used.
