@@ -1,6 +1,8 @@
 History
 ================================================================================
 
+- 1.2 November 5, 2013
+    - install set for http://extras.evolution-cms.com/
 - 1.1 June 15, 2013
     - Updated twitterOAuth class (to solve Twitter 1.1 REST API problems)
 	- Changed link replacement in Tweet output

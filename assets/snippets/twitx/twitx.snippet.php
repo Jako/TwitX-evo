@@ -21,9 +21,9 @@
  *
  * MODX Evolution Port of TwitterX
  * @author Thomas Jakobi <thomas.jakobi@partout.info>
- * @version 1.1
+ * @version 1.2
  *
- * description: <strong>1.1</strong> Load and display Twitter feeds and post Tweets using the Twitter 1.1 REST API
+ * description: <strong>1.2</strong> Load and display Twitter feeds and post Tweets using the Twitter 1.1 REST API
  *
  * TwitterX author: Stewart Orr @ Qodo Ltd <stewart@qodo.co.uk>
  */
