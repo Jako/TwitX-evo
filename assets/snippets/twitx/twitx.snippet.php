@@ -27,6 +27,9 @@
  *
  * TwitterX author: Stewart Orr @ Qodo Ltd <stewart@qodo.co.uk>
  */
+define('TWX_PATH', str_replace(MODX_BASE_PATH, '', str_replace('\\', '/', realpath(dirname(__FILE__)))) . '/');
+define('TWX_BASE_PATH', MODX_BASE_PATH . TWX_PATH);
+
 // Twitter API keys and secrets
 $twitter_consumer_key = isset($twitter_consumer_key) ? $twitter_consumer_key : FALSE;
 $twitter_consumer_secret = isset($twitter_consumer_secret) ? $twitter_consumer_secret : FALSE;
@@ -36,8 +39,8 @@ $twitter_access_token_secret = isset($twitter_access_token_secret) ? $twitter_ac
 // Other options
 $mode = isset($mode) ? $mode : 'timeline';
 $limit = isset($limit) ? $limit : 5;
-$twitTpl = isset($twitTpl) ? $twitTpl : '@FILE:assets/snippets/twitx/templates/twitTpl.html';
-$tweetedTpl = isset($tweetedTpl) ? $tweetedTpl : '@FILE:assets/snippets/twitx/templates/tweetedTpl.html';
+$twitTpl = isset($twitTpl) ? $twitTpl : '@FILE:' . TWX_PATH . 'templates/twitTpl.html';
+$tweetedTpl = isset($tweetedTpl) ? $tweetedTpl : '@FILE:' . TWX_PATH . 'templates/tweetedTpl.html';
 $timeline = isset($timeline) ? $timeline : 'user_timeline';
 $decodeUrls = isset($decodeUrls) ? (boolean) $decodeUrls : TRUE;
 $cache = isset($cache) ? $cache : 7200;
@@ -50,13 +53,13 @@ $outputSeparator = isset($outputSeparator) ? $outputSeparator : "\r\n";
 $toPlaceholder = isset($toPlaceholder) ? $toPlaceholder : '';
 
 if (!class_exists('evoChunkie')) {
-	require MODX_BASE_PATH . 'assets/snippets/twitx/includes/chunkie/chunkie.class.inc.php';
+	require TWX_BASE_PATH . 'includes/chunkie/chunkie.class.inc.php';
 }
 if (!class_exists('evoCache')) {
-	require MODX_BASE_PATH . 'assets/snippets/twitx/includes/cache/cache.class.php';
+	require TWX_BASE_PATH . 'includes/cache/cache.class.php';
 }
 if (!class_exists('TwitterOAuth')) {
-	require MODX_BASE_PATH . 'assets/snippets/twitx/includes/twitteroauth/twitteroauth.php';
+	require TWX_BASE_PATH . 'includes/twitteroauth/twitteroauth.php';
 }
 
 if (!function_exists('twitxFormat')) {
