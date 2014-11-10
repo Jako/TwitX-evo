@@ -40,6 +40,25 @@ $language = array(
 		'ago_years' => '[+time+] Jahren',
 		'today_at' => 'Heute um [+time+]',
 		'yesterday_at' => 'Gestern um [+time+]'
+	),
+	'nederlands' => array(
+		'ago' => '[+time+] geleden',
+		'ago_day' => '[+time+] dag',
+		'ago_days' => '[+time+] dagen',
+		'ago_hour' => '[+time+] uur',
+		'ago_hours' => '[+time+] uren',
+		'ago_minute' => '[+time+] minuut',
+		'ago_minutes' => '[+time+] minuten',
+		'ago_month' => '[+time+] maand',
+		'ago_months' => '[+time+] maanden',
+		'ago_second' => '[+time+] seconde',
+		'ago_seconds' => '[+time+] seconden',
+		'ago_week' => '[+time+] week',
+		'ago_weeks' => '[+time+] weken',
+		'ago_year' => '[+time+] jaar',
+		'ago_years' => '[+time+] jaren',
+		'today_at' => 'Vandaag om [+time+]',
+		'yesterday_at' => 'Gisteren om [+time+]'
 	)
 );
 ?>
