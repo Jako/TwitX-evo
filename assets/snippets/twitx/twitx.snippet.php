@@ -182,8 +182,9 @@ if (!$twitter_consumer_key || !$twitter_consumer_secret || !$twitter_access_toke
 				$json = json_decode($json, TRUE);
 
 				// If there any errors from Twitter, output them...
-				if (isset($json['error'])) {
-					$output[] = "<strong>TwitX Error:</strong> Could not load TwitX. Twitter responded with the error '" . $json->error . "'.";
+				if (empty($json) || isset($json['error'])) {
+					$error = (isset($json['error'])) ? $json['error'] : 'Invalid or empty response';
+					$output[] = "<strong>TwitX Error:</strong> Could not load TwitX. Twitter responded with the error '" . $jerror . "'.";
 				} else {
 					// For each result, output it
 					foreach ($json as &$j) {
